@@ -17,7 +17,7 @@ public class FactoryD1 implements Factory{
             throws DependencyException {
         
         int i;
-        
+
         try {
             i = (int) parameters[0];
         } catch(ClassCastException | ArrayIndexOutOfBoundsException ex){

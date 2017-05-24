@@ -2,9 +2,8 @@
 package simple;
 
 import common.DependencyException;
-
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -12,86 +11,47 @@ import java.util.Map;
  */
 public class Container implements Injector{
 
-    private final Map<String, Object> constants;
-    private final Map<String, Tuple>  factorys ;
+    private Store storeF;
+    private Store storeC;
     
     public Container(){
-        this.constants = new HashMap<>();
-        this.factorys  = new HashMap<>();
+        this.storeF = new StoreFactory();
+        this.storeC = new StoreConstant();
     }
     
     @Override
     public void registerConstant(String name, Object value) 
-            throws DependencyException { 
-        if(!this.constants.containsKey(name)){
-            this.constants.put(name, value);
-        } else throw new DependencyException("Constant duplicat");
+            throws DependencyException {
+        if (!this.storeC.checkElement(name)) {
+            this.storeC.addElement(name, value);
+        } else throw new DependencyException("Constant duplicada");
     }
 
     @Override
     public void registerFactory(String name, Factory creator, String[] parameters) 
             throws DependencyException {
-        if (parameters.length > 0 && shearchParameters(parameters)
-                && !this.factorys.containsKey(name)) {
-            Object[] obj = getParameters(parameters);              
-            this.factorys.put(name, new Tuple(creator, obj));                
-        } else throw new DependencyException("Factory Duplicat o Parametres"); 
+        if (!this.storeF.checkElement(name) && parameters.length > 0) {
+            ArrayList<Object> argvs = new ArrayList<Object>();
+            for (String argv : parameters) {
+                if (this.storeC.checkElement(argv)){ 
+                    argvs.add(this.storeC.getElement(argv));
+                } else throw new DependencyException("Constant no trobada");    
+            }
+            Object[] factory = {creator, argvs};
+            this.storeF.addElement(name, factory);
+        } else throw new DependencyException("Factory duplicada");
     }
 
     @Override
     public Object getObject(String name) 
             throws DependencyException {
         Object ob = null;
-        if (this.constants.containsKey(name)) {
-            ob = this.constants.get(name);   
-        } else if (this.factorys.containsKey(name)) {
-            Factory factory; Object[] parameters;
-            factory    = (Factory) this.factorys.get(name).getFactory();
-            parameters = this.factorys.get(name).getParameters();
-            ob = factory.create(parameters);
-        } else throw new DependencyException("Element No trobat"); 
+        if (this.storeC.checkElement(name)) {
+            ob = this.storeC.getElement(name);   
+        } else if (this.storeF.checkElement(name)) {
+            ob = this.storeF.getElement(name);
+        } else throw new DependencyException("Element no trobat"); 
         return ob;        
-    }
-
-    private boolean shearchParameters(String[] parameters) {
-        boolean shearch = false;
-        for (String parameter : parameters) {
-            if (this.constants.containsKey(parameter)) {
-                shearch = true;
-            } else return false; 
-        }
-        return shearch;  
-    }
-    
-    private Object[] getParameters(String[] parameters) 
-            throws DependencyException{
-        int i = 0;
-        Object[] obj = new Object[parameters.length];
-        for (String parameter : parameters) {
-            obj[i] = this.constants.get(parameter);
-            i = +1;
-        }
-        return obj;
-    } 
-
-    private static class Tuple {
-        
-        private Factory factory;
-        private Object[] parameters;
-        
-        private Tuple(Factory factory, Object[] parameters) {
-            this.factory    = factory;
-            this.parameters = parameters;
-        }
-        
-        private Factory getFactory() {
-            return this.factory;      
-        }
-        
-        private Object[] getParameters() {
-            return this.parameters;     
-        }
-        
     }
     
 }

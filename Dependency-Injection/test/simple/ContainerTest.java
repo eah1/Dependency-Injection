@@ -86,10 +86,8 @@ public class ContainerTest {
         
         this.injector.registerConstant("I", 42);
         this.injector.registerFactory("D", new	FactoryD1(), parameters);
-        
         this.d = (InterfaceD) this.injector.getObject("D");
         assertThat(this.d, is(instanceOf(ImplementationD1.class)));
-        
         this.d1 = (ImplementationD1) this.d;
         assertThat(d1.i, is(42));
         
