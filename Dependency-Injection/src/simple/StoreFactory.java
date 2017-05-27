@@ -3,9 +3,9 @@ package simple;
 
 import java.util.HashMap;
 import java.util.Map;
+import javafx.util.Pair;
 
 import common.DependencyException;
-import java.util.ArrayList;
 
 /**
  *
@@ -13,8 +13,7 @@ import java.util.ArrayList;
  */
 public class StoreFactory extends Store {
     
-    
-    protected Map<String, Tuple> factory ;
+    protected Map<String, Pair<Factory, Object[]>> factory ;
     
     public StoreFactory(){
         super();
@@ -23,23 +22,18 @@ public class StoreFactory extends Store {
     
     @Override
     protected void addElement(String name, Object value) {
-        Object[] factory = (Object[]) value;
-        Object[] parameters = new Object[((ArrayList<Object>) factory[1]).size()];
-        parameters = ((ArrayList<Object>) factory[1]).toArray(parameters);
-        this.factory.put(name, new Tuple((Factory)factory[0], (Object[]) parameters));
+        Pair<Factory, Object[]> factory = (Pair<Factory, Object[]>) value;
+        this.factory.put(name, factory);
     }
 
     @Override
     protected Object getElement(String name) throws DependencyException {
-        Tuple tuple = (Tuple) this.factory.get(name);
-        return tuple.getCreateFactory();
+        return (Pair<Factory, Object[]>) this.factory.get(name);
     }
 
     @Override
     protected boolean checkElement(String name) {
-        if (this.factory.containsKey(name)) {
-            return true;
-        } else return false;
+        return this.factory.containsKey(name);
     }
 
 }

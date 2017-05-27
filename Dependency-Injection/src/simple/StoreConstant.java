@@ -31,9 +31,7 @@ public class StoreConstant  extends Store {
 
     @Override
     protected boolean checkElement(String name) {
-        if (this.constant.containsKey(name)) {
-            return true;
-        } else return false;
+        return this.constant.containsKey(name);
     }
     
 }
