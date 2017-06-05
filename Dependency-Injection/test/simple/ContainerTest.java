@@ -58,10 +58,9 @@ public class ContainerTest {
     public void testRegisterFactoryB1() throws Exception {
         
         System.out.println("registerFactoryB1");
-        String parameters[] = {"D"};
         
         this.injector.registerConstant("D", this.d);
-        this.injector.registerFactory("B", new	FactoryB1(), parameters);
+        this.injector.registerFactory("B", new	FactoryB1(), "D");
         
         this.b = (InterfaceB) this.injector.getObject("B");
         assertThat(this.b, is(instanceOf(ImplementationB1.class)));
@@ -75,10 +74,9 @@ public class ContainerTest {
     public void testRegisterFactoryD1() throws Exception {
         
         System.out.println("registerFactoryD1");
-        String parameters[] = {"I"};
         
         this.injector.registerConstant("I", 42);
-        this.injector.registerFactory("D", new	FactoryD1(), parameters);
+        this.injector.registerFactory("D", new	FactoryD1(), "I");
         this.d = (InterfaceD) this.injector.getObject("D");
         assertThat(this.d, is(instanceOf(ImplementationD1.class)));
         this.d1 = (ImplementationD1) this.d;

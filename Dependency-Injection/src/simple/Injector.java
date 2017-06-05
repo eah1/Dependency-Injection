@@ -12,7 +12,7 @@ public interface Injector {
     void registerConstant(String name, Object value) 
         throws DependencyException;
     
-    void registerFactory(String name, Factory creator, String[] parameters)
+    void registerFactory(String name, Factory creator, String... parameters)
         throws DependencyException;
     
     Object getObject(String name)

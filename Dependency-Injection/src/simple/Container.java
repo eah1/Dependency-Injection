@@ -30,7 +30,7 @@ public class Container implements Injector{
     }
 
     @Override
-    public void registerFactory(String name, Factory creator, String[] parameters) 
+    public void registerFactory(String name, Factory creator, String... parameters) 
             throws DependencyException {
         
         if (!this.storeF.checkElement(name) && parameters.length > 0) {
