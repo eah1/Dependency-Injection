@@ -1,11 +1,9 @@
 
 package complex;
 
-import java.util.HashMap;
-import java.util.Map;
+import javafx.util.Pair;
 
 import common.DependencyException;
-
 
 /**
  *
@@ -14,76 +12,76 @@ import common.DependencyException;
  */
 public class Container<E> implements Injector<E>  {
 
-    private Map<Class<?>, Object> constants;
-    private Map<Class<?>, Tuple<E>> factorys ;
+    private Store storeF;
+    private Store storeC;
 
     public Container(){
-        this.constants = new HashMap<>();
-        this.factorys  = new HashMap<>();
+        this.storeF = new StoreFactory();
+        this.storeC = new StoreConstant();
     }
     
     @Override
     public <E> void registerConstant(Class<E> name, E value) 
             throws DependencyException {
-        if(!this.constants.containsKey(name)){
-            this.constants.put(name, value);
-        } else throw new DependencyException("Constant duplicat");
+        
+        if (!this.storeC.checkElement(name)) {
+            this.storeC.addElement(name, value);
+        } else throw new DependencyException("Constant duplicada");
+        
     }
 
     @Override
     public <E> void registerFactory(Class<E> name, Factory<? extends E> creator, 
-            E[] parameters) throws DependencyException {
-        if (parameters.length > 0 && shearchParameters(parameters)
-                && !this.factorys.containsKey(name)) {
-            Object[] obj = getParameters(parameters);              
-            this.factorys.put(name, new Tuple(creator, obj));                
-        } else throw new DependencyException("Factory Duplicat o Parametres"); 
+           Class<E>... parameters) throws DependencyException {
+        
+        E[] args = (E[]) parameters;
+        
+        if (!this.storeF.checkElement(name) && args.length > 0) {
+            
+            Pair<Factory<? extends E>, E> factory;
+            factory = new Pair(creator, (Object[])args);
+            
+            this.storeF.addElement(name, factory);
+            
+        } else throw new DependencyException("Factory duplicada");
+        
     }
 
     @Override
     public <E> E getObject(Class<E> name) throws DependencyException {
-        Object ob = null;
-        if (this.constants.containsKey(name)) {
-            ob = this.constants.get(name);   
-        } else if (this.factorys.containsKey(name)) {
-            Factory factory; Object[] parameters;
-            factory    = (Factory) this.factorys.get(name).factory;
-            parameters = this.factorys.get(name).parameters;
-            ob = factory.create(parameters);
-        } else throw new DependencyException("Element No trobat"); 
-        return (E) ob;  
-    }
-
-    private <E> boolean shearchParameters(E[] parameters) {
-        boolean shearch = false;
-        for (E parameter : parameters) {
-            if (this.constants.containsKey(parameter)) {
-                shearch = true;
-            } else return false; 
-        }
-        return shearch;
-    }
-
-    private <E> Object[] getParameters(E[] parameters) {
-        int i = 0;
-        Object[] obj = new Object[parameters.length];
-        for (E parameter : parameters) {
-            obj[i] = this.constants.get(parameter);
-            i = +1;
-        }
-        return obj;
-    }
-    
-    private static class Tuple<E> {
-
-        private Factory<? extends E> factory;
-        private E[] parameters;
         
-        private Tuple(Factory<? extends E> factory, E[] parameters){
-            this.factory    = factory;
-            this.parameters = parameters;
-        }
-
+        Object ob = null;
+        
+        if (this.storeC.checkElement(name)) {
+            return (E) this.storeC.getElement(name);
+        } else if (this.storeF.checkElement(name)) {
+            
+            E tuple = (E) this.storeF.getElement(name);
+            Pair<Factory<? extends E>, E> factory = (Pair<Factory<? extends E>, E>) tuple;
+            E[] argv = this.getParameters((E[]) factory.getValue());
+            
+            return factory.getKey().create(argv);
+            
+        } else throw new DependencyException("Element no trobat");
     }
     
+    private <E> E[] getParameters(E[] parameters) 
+            throws DependencyException {
+
+        E[] argv = (E[]) new Object[parameters.length];
+        Integer i = 0;
+        
+        for (E parameter : parameters) {
+            
+            if (this.storeC.checkElement((Class) parameter)) {
+                argv[i] = (E) this.storeC.getElement((Class) parameter);
+                i = i + 1;
+            } else throw new DependencyException("Error arguments");
+            
+        }
+        
+        return argv;
+        
+    }
+      
 }

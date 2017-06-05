@@ -58,11 +58,12 @@ public class ContainerTest {
     public void testRegisterFactoryA1() throws DependencyException {
         
         System.out.println("registerFactoryA1");
-        Object parameters[] = {InterfaceB.class, InterfaceC.class};
+        //Object parameters[] = {InterfaceB.class, InterfaceC.class};
         
         this.injector.registerConstant(InterfaceB.class, this.b);
         this.injector.registerConstant(InterfaceC.class, this.c);
-        this.injector.registerFactory(InterfaceA.class, new FactoryA1(), parameters);
+        this.injector.registerFactory(InterfaceA.class, new FactoryA1(), 
+            InterfaceB.class, InterfaceC.class);
         
         this.a = (InterfaceA) this.injector.getObject(InterfaceA.class);
         assertThat(this.a, is(instanceOf(ImplementationA1.class)));
@@ -77,10 +78,10 @@ public class ContainerTest {
     public void testRegisterFactoryC1() throws DependencyException {
         
         System.out.println("registerFactoryC1");
-        Object parameters[] = {String.class};
+        //Object parameters[] = {String.class};
         
         this.injector.registerConstant(String.class, "Hola");
-        this.injector.registerFactory(InterfaceC.class, new FactoryC1(), parameters);
+        this.injector.registerFactory(InterfaceC.class, new FactoryC1(), String.class);
         
         this.c = (InterfaceC) this.injector.getObject(InterfaceC.class);
         assertThat(this.c, is(instanceOf(ImplementationC1.class)));
@@ -107,8 +108,8 @@ public class ContainerTest {
         Object parameters[] = {String.class};
         
         this.injector.registerConstant(String.class, "Hola");
-        this.injector.registerFactory(InterfaceC.class, new FactoryC1(), parameters);
-        this.injector.registerFactory(InterfaceC.class, new FactoryC1(), parameters);
+        this.injector.registerFactory(InterfaceC.class, new FactoryC1(), String.class);
+        this.injector.registerFactory(InterfaceC.class, new FactoryC1(), String.class);
 
     }
     
@@ -118,7 +119,7 @@ public class ContainerTest {
         System.out.println("testErrorRegisterFactoryParameters");
         Object parameters[] = {};
   
-        this.injector.registerFactory(InterfaceC.class, new FactoryC1(), parameters);
+        this.injector.registerFactory(InterfaceC.class, new FactoryC1());
 
     }
       

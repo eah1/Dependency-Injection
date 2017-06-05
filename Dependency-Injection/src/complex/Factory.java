@@ -10,6 +10,6 @@ import common.DependencyException;
  */
 public interface Factory<E> {
     
-    <E> E create(Object[] parameters) throws DependencyException;
+    <E> E create(Object... parameters) throws DependencyException;
     
 }
