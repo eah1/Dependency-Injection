@@ -9,7 +9,7 @@ import common.DependencyException;
  */
 public interface Factory {
     
-    Object create(Object... parameters)
+    public Object create(Object... parameters)
         throws DependencyException;
     
 }

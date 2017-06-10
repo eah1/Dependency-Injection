@@ -9,13 +9,13 @@ import common.DependencyException;
  */
 public interface Injector {
     
-    void registerConstant(String name, Object value) 
+    public void registerConstant(String name, Object value) 
         throws DependencyException;
     
-    void registerFactory(String name, Factory creator, String... parameters)
+    public void registerFactory(String name, Factory creator, String... parameters)
         throws DependencyException;
     
-    Object getObject(String name)
+    public Object getObject(String name)
         throws DependencyException;
     
 }
