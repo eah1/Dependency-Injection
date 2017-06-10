@@ -54,7 +54,7 @@ public class Container implements Injector{
             
             Object tuple = this.storeF.getElement(name);
             Pair<Factory, Object[]> factory = (Pair<Factory, Object[]>) tuple;
-            
+
             Object[] argv = this.getParameters(factory.getValue());
             
             return factory.getKey().create(argv);
@@ -70,7 +70,7 @@ public class Container implements Injector{
         int i = 0;
         
         for (Object parameter : parameters) {
-            
+
             if (this.storeC.checkElement((String) parameter)) {
                 argv[i] = this.storeC.getElement((String) parameter);
             } else throw new DependencyException("Error arguments");
