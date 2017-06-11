@@ -15,11 +15,22 @@ public class Container<E> implements Injector<E>  {
     private Store storeF;
     private Store storeC;
 
+    /**
+     * Constructor de la classe Container. 
+     * Iniciarem el Store de Factory i de Constant.
+     */
     public Container(){
         this.storeF = new StoreFactory();
         this.storeC = new StoreConstant();
     }
     
+    /**
+     * Metode per registrar Constants.
+     * @param <E>
+     * @param name Clau en que es guardara al Map de Constants.
+     * @param value Valor en que es guardara al Map de Constants.
+     * @throws DependencyException 
+     */
     @Override
     public <E> void registerConstant(Class<E> name, E value) 
             throws DependencyException {
@@ -30,6 +41,15 @@ public class Container<E> implements Injector<E>  {
         
     }
 
+    /**
+     * Els parametres, creator i parameters, els ficarem en una Pair de Factory, 
+     * Object[] que sera el nostre valor del Map de Factorys.
+     * @param <E>
+     * @param name Clau en que es guardara al Map de Factorys.
+     * @param creator Factory que es guardara.
+     * @param parameters Parametres relacionats en la Factory.
+     * @throws DependencyException 
+     */
     @Override
     public <E> void registerFactory(Class<E> name, Factory<? extends E> creator, 
            Class<E>... parameters) throws DependencyException {
@@ -47,6 +67,13 @@ public class Container<E> implements Injector<E>  {
         
     }
 
+    /**
+     * Metode per obtenir els valors de les Contants o de les Factorys.
+     * @param <E>
+     * @param name Nom que fara de referencia per fer la busqueda.
+     * @return Objecte, que tindra el valor de la Contants o de les Factorys.
+     * @throws DependencyException 
+     */
     @Override
     public <E> E getObject(Class<E> name) throws DependencyException {
         
@@ -56,8 +83,9 @@ public class Container<E> implements Injector<E>  {
             return (E) this.storeC.getElement(name);
         } else if (this.storeF.checkElement(name)) {
             
-            E tuple = (E) this.storeF.getElement(name);
-            Pair<Factory<? extends E>, E> factory = (Pair<Factory<? extends E>, E>) tuple;
+            Pair<Factory<? extends E>, E> factory = 
+                    (Pair<Factory<? extends E>, E>) this.storeF.getElement(name);
+            
             E[] argv = this.getParameters((E[]) factory.getValue());
             
             return factory.getKey().create(argv);
@@ -65,6 +93,13 @@ public class Container<E> implements Injector<E>  {
         } else throw new DependencyException("Element no trobat");
     }
     
+    /**
+     * Metode, per obtenir els valors dels parametres de les Factorys.
+     * @param <E>
+     * @param parameters Parametres relacionats en la Factory.
+     * @return Array de Object, amb els valors dels parametres.
+     * @throws DependencyException 
+     */
     private <E> E[] getParameters(E[] parameters) 
             throws DependencyException {
 
