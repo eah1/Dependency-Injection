@@ -102,7 +102,7 @@ public class Container implements Injector{
         for (Object parameter : parameters) {
 
             if (this.storeC.checkElement((String) parameter)) {
-                argv[i] = this.storeC.getElement((String) parameter);
+                argv[i] = this.getObject((String) parameter);
                 i++;
             } else throw new DependencyException("Error arguments");
             
